@@ -1,0 +1,549 @@
+{
+  "info": {
+    "_postman_id": "adf4afb4-955e-47f6-b3e9-6191dc145da8",
+    "name": "Workforce API tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "5057586"
+  },
+  "item": [
+    {
+      "name": "Positive scenarios",
+      "item": [
+        {
+          "name": "Employees",
+          "item": [
+            {
+              "name": "Create Employees",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 201\", function () {",
+                      "    pm.response.to.have.status(201);",
+                      "});",
+                      "",
+                      "pm.test(\"Response has required fields\", () => {",
+                      "  const json = pm.response.json();",
+                      "  pm.expect(json).to.have.property(\"emp_id\");",
+                      "  pm.expect(json).to.have.property(\"emp_name\");",
+                      "  pm.expect(json).to.have.property(\"emp_email\");",
+                      "  pm.expect(json).to.have.property(\"emp_department\");",
+                      "  pm.expect(json).to.have.property(\"emp_supervisor\");",
+                      "});",
+                      "",
+                      "pm.test(\"Employee data is correct\", () => {",
+                      "  const json = pm.response.json();",
+                      "  pm.expect(json.emp_email).to.eql(\"ram.dahal@example.com\");",
+                      "  pm.expect(json.emp_name).to.eql(\"Ram Dahal\");",
+                      "});",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"emp_id\": \"EMP001\",\n    \"emp_name\": \"Ram Dahal\",\n    \"emp_email\": \"ram.dahal@example.com\",\n    \"emp_department\": \"Engineering\",\n    \"emp_supervisor\": \"Shyam Jha\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}api/employees",
+                  "host": [
+                    "{{base_url}}api"
+                  ],
+                  "path": [
+                    "employees"
+                  ]
+                },
+                "description": "Expected result :  \n201 Created"
+              },
+              "response": []
+            },
+            {
+              "name": "Retrieve Employees",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status is 200 OK\", () => {",
+                      "  pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test(\"Response contains employee ID\", () => {",
+                      "  const json = pm.response.json();",
+                      "  pm.expect(json.id).to.eql(pm.collectionVariables.get(\"emp_id\"));",
+                      "});",
+                      "",
+                      "pm.test(\"Required fields present\", () => {",
+                      "  const json = pm.response.json();",
+                      "  [\"emp_id\", \"emp_name\", \"emp_email\", \"emp_department\", \"emp_supervisor\"].forEach(field => {",
+                      "    pm.expect(json).to.have.property(field);",
+                      "  });",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}api/employees/EMP001",
+                  "host": [
+                    "{{base_url}}api"
+                  ],
+                  "path": [
+                    "employees",
+                    "EMP001"
+                  ]
+                },
+                "description": "Expected :\n\n200 OK"
+              },
+              "response": []
+            },
+            {
+              "name": "Update Employee",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"emp_department\": \"QA\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}api/employees/EMP001",
+                  "host": [
+                    "{{base_url}}api"
+                  ],
+                  "path": [
+                    "employees",
+                    "EMP001"
+                  ]
+                },
+                "description": "Expected :\n\n200 OK"
+              },
+              "response": []
+            },
+            {
+              "name": "Delete employee",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}api/employees/EMP001",
+                  "host": [
+                    "{{base_url}}api"
+                  ],
+                  "path": [
+                    "employees",
+                    "EMP001"
+                  ]
+                },
+                "description": "Expected :\n\n204 No content"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Training",
+          "item": [
+            {
+              "name": "Assign Training",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status is 201 Created\", () => {",
+                      "  pm.response.to.have.status(201);",
+                      "});",
+                      "",
+                      "pm.test(\"Assigned training has required fields\", () => {",
+                      "  const json = pm.response.json();",
+                      "  pm.expect(json).to.have.property(\"training_id\");",
+                      "  pm.expect(json).to.have.property(\"emp_id\");",
+                      "  pm.expect(json).to.have.property(\"due_date\");",
+                      "});",
+                      "",
+                      "pm.collectionVariables.set(\"training_id\", pm.response.json().training_id);"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"emp_id\":\"EMP001\",\n    \"training_id\": \"TR001\",\n    \"due_date\" : \"2026-08-01\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}api/trainings/assign",
+                  "host": [
+                    "{{base_url}}api"
+                  ],
+                  "path": [
+                    "trainings",
+                    "assign"
+                  ]
+                },
+                "description": "Expected :\n\n201 created"
+              },
+              "response": []
+            },
+            {
+              "name": "Complete Training",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status is 200 OK\", () => {",
+                      "  pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test(\"Status updated to COMPLETED\", () => {",
+                      "  const json = pm.response.json();",
+                      "  // suppose api returns staus : COMPLETED in json response",
+                      "  pm.expect(json.status).to.eql(\"COMPLETED\"); ",
+                      "});",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"emp_id\":\"EMP001\",\n    \"training_id\": \"TR001\",\n    \"completion_date\" : \"2026-07-28\",\n    \"notes\" : \"Completed by Ram\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}api/trainings/complete",
+                  "host": [
+                    "{{base_url}}api"
+                  ],
+                  "path": [
+                    "trainings",
+                    "complete"
+                  ]
+                },
+                "description": "Expected :\n\n200 Ok"
+              },
+              "response": []
+            },
+            {
+              "name": "Approve training",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status is 200 OK\", () => {",
+                      "  pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test(\"Status updated to APPROVED\", () => {",
+                      "  const json = pm.response.json();",
+                      "  pm.expect(json.status).to.eql(\"APPROVED\");",
+                      "});",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"emp_id\" : \"EMP001\",\n    \"training_id\" : \"TR001\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}api/trainings/approve",
+                  "host": [
+                    "{{base_url}}api"
+                  ],
+                  "path": [
+                    "trainings",
+                    "approve"
+                  ]
+                },
+                "description": "Expected:\n\n200 OK"
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Negative scenario",
+      "item": [
+        {
+          "name": "Duplicate email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Duplicate email message displayed\", function () {",
+                  "    pm.expect(jsonData.message).to.include(\"email\");",
+                  "});",
+                  "",
+                  "pm.test(\"Status code should be 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"emp_id\": \"EMP001\",\n    \"emp_name\": \"Ram Dahal\",\n    \"emp_email\": \"ram.dahal@example.com\",\n    \"emp_department\": \"Engineering\",\n    \"emp_supervisor\": \"Shyam Jha\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}api/employees",
+              "host": [
+                "{{base_url}}api"
+              ],
+              "path": [
+                "employees"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Missing employee id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"emp_name\": \"Ram Dahal\",\n    \"emp_email\": \"ram.dahal@example.com\",\n    \"emp_department\": \"Engineering\",\n    \"emp_supervisor\": \"Shyam Jha\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}api/employee",
+              "host": [
+                "{{base_url}}api"
+              ],
+              "path": [
+                "employee"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid Training ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"emp_id\":\"EMP001\",\n    \"training_id\": \"TR00000000\",\n    \"due_date\" : \"2026-08-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}api/trainings/assign",
+              "host": [
+                "{{base_url}}api"
+              ],
+              "path": [
+                "trainings",
+                "assign"
+              ]
+            },
+            "description": "Expected :\n\n201 created"
+          },
+          "response": []
+        },
+        {
+          "name": "Approve non-completed training",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"emp_id\":\"EMP001\",\n    \"training_id\": \"TR001\",\n    \"completion_date\" : \"2026-07-28\",\n    \"notes\" : \"Completed by Ram\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}api/trainings/complete",
+              "host": [
+                "{{base_url}}api"
+              ],
+              "path": [
+                "trainings",
+                "complete"
+              ]
+            },
+            "description": "Call this api before EMO001 marks TR001 training as complete."
+          },
+          "response": []
+        },
+        {
+          "name": "Complete Unassigned Training",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"emp_id\":\"EMP001\",\n    \"training_id\": \"TR001\",\n    \"completion_date\" : \"2026-07-28\",\n    \"notes\" : \"Completed by Ram\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}api/trainings/complete",
+              "host": [
+                "{{base_url}}api"
+              ],
+              "path": [
+                "trainings",
+                "complete"
+              ]
+            },
+            "description": "TR002 is not assigned to EMP001.\n\nThus an error message is shown,\n\nStatus code : 400"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": ""
+    }
+  ]
+}
